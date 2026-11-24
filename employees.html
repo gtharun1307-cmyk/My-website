@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}VVITU Directory{% endblock %}
+{% block page_title %}VVITU Employee Directory{% endblock %}
+
+{% block content %}
+<div class="frost-panel">
+    <div class="panel-top">
+        <form method="GET" style="display:flex; gap:12px; flex-wrap:wrap; flex:1;">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search VVITU ID, email, or role..." style="max-width:300px;">
+            <select name="department" style="max-width:220px;">
+                <option value="">All Departments</option>
+                <option value="Engineering" {{ 'selected' if dept_filter == 'Engineering' else '' }}>Engineering</option>
+                <option value="Product" {{ 'selected' if dept_filter == 'Product' else '' }}>Product</option>
+                <option value="Human Resources" {{ 'selected' if dept_filter == 'Human Resources' else '' }}>Human Resources</option>
+                <option value="Finance" {{ 'selected' if dept_filter == 'Finance' else '' }}>Finance</option>
+                <option value="Operations" {{ 'selected' if dept_filter == 'Operations' else '' }}>Operations</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{{ url_for('export_csv', data_type='employees') }}" class="btn btn-outline">CSV</a>
+        </form>
+        <a href="{{ url_for('add_employee') }}" class="btn btn-hr">+ Add Employee</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>VVITU ID</th>
+                <th>Login Email</th>
+                <th>Department & Role</th>
+                <th>Monthly Package</th>
+                <th>Status</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td>
+                    <div class="emp-cell">
+                        <img src="{{ emp.avatar_url or '/static/images/avatar_emp1.png' }}" class="emp-avatar" alt="Avatar">
+                        <strong>{{ emp.emp_code }}</strong>
+                    </div>
+                </td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.department }} • {{ emp.emp_role }}</td>
+                <td>Rs. {{ "%.2f"|format(emp.basic_salary) }}</td>
+                <td><span class="pill pill-green">{{ emp.status }}</span></td>
+                <td>
+                    <form method="POST" action="{{ url_for('delete_employee', emp_id=emp.id) }}" onsubmit="return confirm('Delete {{ emp.emp_code }}?');">
+                        <input type="hidden" name="next" value="employees">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align:center; color:var(--text-soft);">No employees found. Click "+ Add Employee" to add one.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

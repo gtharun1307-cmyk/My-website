@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}VVITU Attendance{% endblock %}
+{% block page_title %}VVITU Attendance — {{ selected_date }}{% endblock %}
+
+{% block content %}
+<div class="frost-panel">
+    <div class="panel-top">
+        <h3>Mark Attendance</h3>
+        <form method="GET" style="display:flex; gap:8px;">
+            <input type="date" name="date" value="{{ selected_date }}">
+            <button type="submit" class="btn btn-sm btn-primary">Load</button>
+        </form>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="att_date" value="{{ selected_date }}">
+        <table>
+            <thead>
+                <tr>
+                    <th>VVITU ID</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                {% set current = att_map.get(emp.id) %}
+                <tr>
+                    <td><strong>{{ emp.emp_code }}</strong><input type="hidden" name="emp_id" value="{{ emp.id }}"></td>
+                    <td>{{ emp.email }}</td>
+                    <td>
+                        <select name="status_{{ emp.id }}">
+                            {% set st = current.status if current else 'Present' %}
+                            <option value="Present" {{ 'selected' if st == 'Present' else '' }}>Present</option>
+                            <option value="Absent" {{ 'selected' if st == 'Absent' else '' }}>Absent</option>
+                            <option value="Half-Day" {{ 'selected' if st == 'Half-Day' else '' }}>Half-Day</option>
+                            <option value="Leave" {{ 'selected' if st == 'Leave' else '' }}>Leave</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="remarks_{{ emp.id }}" value="{{ current.remarks if current else '' }}" placeholder="Note"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary" style="margin-top:16px;">Save Attendance</button>
+    </form>
+</div>
+{% endblock %}

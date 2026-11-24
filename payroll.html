@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}VVITU Monthly Salary{% endblock %}
+{% block page_title %}VVITU Monthly Salary & Saved Payslips{% endblock %}
+
+{% block content %}
+<div class="frost-panel">
+    <div class="panel-top">
+        <h3>1. Generate Monthly Payroll ({{ selected_month }})</h3>
+        <form method="GET" style="display:flex; gap:8px;">
+            <input type="month" name="month" value="{{ selected_month }}">
+            <button type="submit" class="btn btn-sm btn-primary">Load Month</button>
+        </form>
+    </div>
+    <form method="POST" style="display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;">
+        <input type="hidden" name="action" value="generate">
+        <div>
+            <label>Month</label>
+            <input type="month" name="month_year" value="{{ selected_month }}" required>
+        </div>
+        <div>
+            <label>Working Days</label>
+            <input type="number" name="working_days" value="26" min="1" max="31" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Calculate Salaries</button>
+    </form>
+</div>
+
+<div class="frost-panel">
+    <div class="panel-top">
+        <h3>2. Salary Sheet — {{ selected_month }}</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>VVITU Employee</th>
+                <th>Days</th>
+                <th>Basic</th>
+                <th>HRA</th>
+                <th>Special</th>
+                <th>Bonus</th>
+                <th>Deductions</th>
+                <th>Net Salary</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payroll_rows %}
+            <tr>
+                {% if p.payment_status != 'Paid' %}
+                <form method="POST">
+                    <input type="hidden" name="action" value="edit_salary">
+                    <input type="hidden" name="payroll_id" value="{{ p.id }}">
+                    <td><strong>{{ p.emp_code }}</strong><br><small style="color:var(--text-soft);">{{ p.email }}</small></td>
+                    <td><input type="number" step="0.5" name="present_days" value="{{ p.present_days }}" style="width:65px;"> / {{ p.working_days }}</td>
+                    <td><input type="number" step="0.01" name="basic_salary" value="{{ p.basic_salary }}" style="width:90px;"></td>
+                    <td><input type="number" step="0.01" name="hra_allowance" value="{{ p.hra_allowance }}" style="width:82px;"></td>
+                    <td><input type="number" step="0.01" name="special_allowance" value="{{ p.special_allowance }}" style="width:82px;"></td>
+                    <td><input type="number" step="0.01" name="bonus" value="{{ p.bonus }}" style="width:75px;"></td>
+                    <td><input type="number" step="0.01" name="deductions" value="{{ p.deductions }}" style="width:82px;"></td>
+                    <td><strong>Rs. {{ "%.2f"|format(p.net_salary) }}</strong></td>
+                    <td><span class="pill pill-yellow">Pending</span></td>
+                    <td style="white-space:nowrap;">
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                </form>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="action" value="mark_paid">
+                            <input type="hidden" name="payroll_id" value="{{ p.id }}">
+                            <button type="submit" class="btn btn-sm btn-hr">Pay & Save Slip</button>
+                        </form>
+                    </td>
+                {% else %}
+                    <td><strong>{{ p.emp_code }}</strong><br><small style="color:var(--text-soft);">{{ p.email }}</small></td>
+                    <td>{{ p.present_days }} / {{ p.working_days }}</td>
+                    <td>Rs. {{ "%.2f"|format(p.basic_salary) }}</td>
+                    <td>Rs. {{ "%.2f"|format(p.hra_allowance) }}</td>
+                    <td>Rs. {{ "%.2f"|format(p.special_allowance) }}</td>
+                    <td>Rs. {{ "%.2f"|format(p.bonus) }}</td>
+                    <td style="color:var(--rose);">-Rs. {{ "%.2f"|format(p.deductions) }}</td>
+                    <td><strong style="color:var(--emerald);">Rs. {{ "%.2f"|format(p.net_salary) }}</strong></td>
+                    <td><span class="pill pill-green">Paid & Saved</span><br><small>{{ p.receipt_no }}</small></td>
+                    <td><a href="{{ url_for('payslip', payroll_id=p.id) }}" class="btn btn-sm btn-outline">View Saved Slip</a></td>
+                {% endif %}
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="10" style="text-align:center; color:var(--text-soft);">No salaries calculated yet for {{ selected_month }}.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

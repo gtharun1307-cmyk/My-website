@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VVITU — Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="glass-auth-wrap">
+    <div class="glass-login-card anim-page-3d" style="max-width: 510px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="/static/images/vvitu_logo.svg" alt="VVITU" style="width: 48px; height: 48px; margin-bottom: 8px;">
+            <h2 style="font-size: 1.45rem; font-weight: 800;">VVITU Registration</h2>
+            <p style="color: var(--text-soft); font-size: 0.85rem;">HR & Administrator Account Setup</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="alert alert-{{ category }}">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Role *</label>
+                <select name="role" required>
+                    <option value="HR">HR</option>
+                    <option value="Administrator">Administrator</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Display Name *</label>
+                <input type="text" name="full_name" placeholder="VVITU Officer" required>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>VVITU Email *</label>
+                    <input type="email" name="email" placeholder="name@vvitu.ac.in" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="text" name="phone" placeholder="9876543210" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Department *</label>
+                <input type="text" name="department" placeholder="Human Resources / Operations" required>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password *</label>
+                    <input type="password" name="confirm_password" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 12px;">Create Account</button>
+        </form>
+
+        <div style="margin-top: 16px; text-align: center; font-size: 0.86rem; color: var(--text-soft);">
+            Already registered? <a href="{{ url_for('login') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Sign in</a>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/3d_motion.js') }}"></script>
+</body>
+</html>
